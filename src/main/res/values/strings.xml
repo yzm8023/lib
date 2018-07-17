@@ -7,5 +7,6 @@
     <string name="choose_empty">Chooser is Empty</string>
     <string name="noApplications">No find applications</string>
     <string name="add_account_button_label">Add account</string>
-    <string name="foreground_notification_tip">我是应用魔方，正在构造你的隐私虚拟空间^_^</string>
+    <string name="fg_notification_title">应用魔方</string>
+    <string name="fg_notification_tip">Hi，我正在构造你的隐私虚拟空间^_^</string>
 </resources>
