@@ -188,10 +188,13 @@ public class VAppManagerService implements IAppManager {
         }
         boolean dependSystem = (flags & InstallStrategy.DEPEND_SYSTEM_IF_EXIST) != 0
                 && VirtualCore.get().isOutsideInstalled(pkg.packageName);
-
-        if (existSetting != null && existSetting.dependSystem) {
+        /**
+         * @YZM
+         * 这里肯定有问题，之前是依赖系统的，现在为什么要改成不依赖系统呢，所以先暂时注释掉这里
+         **/
+        /*if (existSetting != null && existSetting.dependSystem) {
             dependSystem = false;
-        }
+        }*/
 
         NativeLibraryHelperCompat.copyNativeBinaries(new File(path), libDir);
         if (!dependSystem) {
