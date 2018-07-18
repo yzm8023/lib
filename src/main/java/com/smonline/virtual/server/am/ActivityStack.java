@@ -11,6 +11,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.os.RemoteException;
+import android.text.TextUtils;
 import android.util.SparseArray;
 
 import com.smonline.virtual.client.core.VirtualCore;
@@ -24,6 +25,7 @@ import com.smonline.virtual.remote.StubActivityRecord;
 
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 import java.util.ListIterator;
 
 import mirror.android.app.ActivityManagerNative;
@@ -628,6 +630,47 @@ import static android.content.pm.ActivityInfo.LAUNCH_SINGLE_TOP;
                             iterator.remove();
                             if (task.activities.isEmpty()) {
                                 mHistory.remove(task.taskId);
+                                /**
+                                 * @YZM
+                                 * 清理进程后也要清理相应的Task，否则通过最近任务页面再次尝试启动时可能报错
+                                 */
+                                if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){
+                                    ActivityManager mActivityManager = (ActivityManager) VirtualCore.get().getContext().getSystemService(Context.ACTIVITY_SERVICE);
+                                    List<ActivityManager.AppTask> appTasks = mActivityManager.getAppTasks();
+                                    try{
+                                        if(appTasks!=null&&appTasks.size()>0){
+
+                                            for (ActivityManager.AppTask appTask : appTasks) {
+                                                ActivityManager.RecentTaskInfo taskInfo = appTask.getTaskInfo();
+
+                                                if (taskInfo != null && taskInfo.baseIntent != null) {
+                                                    Intent baseIntent = taskInfo.baseIntent;
+
+                                                    if (baseIntent.getComponent() == null) continue;
+
+                                                    ComponentName commponent = baseIntent.getComponent();
+                                                    if (commponent == null) continue;
+                                                    if (!VirtualCore.get().getHostPkg().equals(commponent.getPackageName())) {
+                                                        continue;
+                                                    }
+                                                    String stubActivity = commponent.getClassName();
+
+                                                    if (TextUtils.isEmpty(stubActivity)) continue;
+
+                                                    if(!stubActivity.contains("$C")) continue;
+
+                                                    String indexS = stubActivity.substring(stubActivity.indexOf("$C") + 2);
+                                                    int index = Integer.valueOf(indexS);
+                                                    if (index == record.vpid) {
+                                                        appTask.finishAndRemoveTask();
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }catch (Exception e){
+                                        e.printStackTrace();
+                                    }
+                                }
                             }
                         }
                     }
