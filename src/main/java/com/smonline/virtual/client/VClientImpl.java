@@ -454,6 +454,17 @@ public final class VClientImpl extends IVClient.Stub {
             Context hostContext = VirtualCore.get().getContext();
             return hostContext.createPackageContext(packageName, Context.CONTEXT_INCLUDE_CODE | Context.CONTEXT_IGNORE_SECURITY);
         } catch (PackageManager.NameNotFoundException e) {
+            /**
+             * @YZM
+             * 插件进程启动失败
+             */
+            Intent intent = new Intent();
+            intent.putExtra("crashPkg",packageName);
+            ComponentName componentName = new ComponentName("com.smonline.appbox",
+                    "com.smonline.appbox.ui.splashloading.SplashLoadingActivity");
+            intent.setComponent(componentName);
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            VirtualCore.get().getContext().startActivity(intent);
             e.printStackTrace();
             VirtualRuntime.crash(new RemoteException());
         }
