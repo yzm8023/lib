@@ -461,7 +461,7 @@ public final class VClientImpl extends IVClient.Stub {
             Intent intent = new Intent();
             intent.putExtra("crashPkg",packageName);
             ComponentName componentName = new ComponentName("com.smonline.appbox",
-                    "com.smonline.appbox.ui.splashloading.SplashLoadingActivity");
+                    "com.smonline.appbox.ui.splashloading.LoadingAppActivity");
             intent.setComponent(componentName);
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             VirtualCore.get().getContext().startActivity(intent);
